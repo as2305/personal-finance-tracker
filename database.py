@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 from datetime import date
+import secrets
+
 
 balance = {
     "balance": 0
@@ -9,6 +11,23 @@ transaction_history = []
 
 bal_path = Path("balance.json")
 th_path = Path("transaction_history.json")
+
+
+#future implementation
+#def balance_calc(a):
+#    total_deposit = 0
+#    total_withdrawn = 0
+#    for entry in a:
+#        if entry["mode"] == "deposit":
+#            total_deposit += entry["amount"]
+#        elif entry["mode"] == "withdraw":
+#            total_withdrawn += entry["amount"]
+#    return total_deposit - total_withdrawn
+
+
+#generate unique ID
+def id_gen():
+    return secrets.token_hex(3)
 
 #Initialize Database
 def init_db():
@@ -35,15 +54,32 @@ def add_transaction(mode, amount):
     global transaction_history
     if mode == "deposit":
         balance["balance"] += amount
-        transaction_history.append({"mode": mode, "amount": amount, "date": str(date.today())})
+        transaction_history.append({"id": id_gen(), "mode": mode, "amount": amount, "date": str(date.today())})
         update_bal()
         update_th()
         return True
     elif mode == "withdraw":
         balance["balance"] -= amount
-        transaction_history.append({"mode": mode, "amount": amount, "date": str(date.today())})
+        transaction_history.append({"id": id_gen(), "mode": mode, "amount": amount, "date": str(date.today())})
         update_bal()
         update_th()
+        return True
+    else:
+        return False
+
+def del_transaction(uid):
+    global balance
+    global transaction_history
+    length = len(transaction_history)
+    for i in transaction_history:
+        if i["id"] == uid:
+            if i["mode"] == "withdraw":
+                balance["balance"] += i["amount"]
+            elif i["mode"] == "deposit":
+                balance["balance"] -= i["amount"]
+    transaction_history = [e for e in transaction_history if e["id"] != uid]
+    update_th()
+    if len(transaction_history) != length:
         return True
     else:
         return False

@@ -15,6 +15,13 @@ def record(mode:str, amount:int):
     else:
         return {"message": "failed"}
     
+@app.post("/delete")
+def delete(uid:str):
+    output = database.del_transaction(uid)  
+    if output:
+        return {"message": "success"}
+    else:
+        return {"message": "failed"}
 
 @app.get("/balance")
 def get_balance():
