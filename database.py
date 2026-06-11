@@ -67,10 +67,12 @@ def add_transaction(mode, amount):
     else:
         return False
 
+
 def del_transaction(uid):
     global balance
     global transaction_history
     length = len(transaction_history)
+    #add break statement
     for i in transaction_history:
         if i["id"] == uid:
             if i["mode"] == "withdraw":
